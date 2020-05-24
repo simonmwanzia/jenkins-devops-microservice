@@ -43,6 +43,32 @@ pipeline {
 				echo "Integration Test"
 			}
 		}
+		stage("Package"){
+			steps{				
+				sh "mv package -DskipTests"
+			}
+		}
+
+		stage("Build Docker Image"){
+			steps{			
+				//"docker build -t in28min/currency-exchange-devops:$env.BUILD_TAG"
+				script{
+					dockerImage=docker.build("smumo/hello-world-python:${env.BUILD_TAG}")
+				}
+
+			}
+		}
+		stage("push Docker Image"){
+			steps{				
+				//echo "Integration Test"
+				docker.withRegistry('','dockerhub'){
+					dockerImage.push();
+					dockerImage.push('latest');
+				}
+				
+
+			}
+		}
 	}
 
 	post{
